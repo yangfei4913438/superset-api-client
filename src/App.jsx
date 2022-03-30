@@ -3,10 +3,47 @@ import './App.css';
 import axios from 'axios';
 
 function App() {
-  const [token, setToken] = useState({
-    access_token: '',
-    refresh_token: '',
-  });
+  const [token, setToken] = useState('');
+  const [response, setResponse] = useState({});
+
+  const query = () => {
+    axios
+      .post(
+        '/api/v1/chart/data',
+        {
+          datasource: { id: 145, type: 'table' }, // 确定好数据集的ID，类型不改！
+          force: false,
+          queries: [
+            {
+              extras: {
+                having: '',
+                having_druid: [],
+                where: "(question_key = 'q1001')",
+              },
+              columns: ['organ_name'],
+              metrics: ['上月满意度', '本月满意度'],
+              orderby: [['本月满意度', false]], // 降序排列
+              row_limit: 10000,
+            },
+          ],
+          result_format: 'json',
+          result_type: 'full',
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(res => {
+        console.log('查询数据:', res);
+        setResponse(res.data.result[0]);
+      })
+      .catch(err => {
+        console.error('查询出错:', err);
+      });
+  };
 
   const login = () => {
     axios
@@ -14,25 +51,27 @@ function App() {
         username: 'admin',
         password: 'Superset',
         provider: 'db',
-        refresh: true,
       })
       .then(res => {
-        console.log('res:', res);
-        setToken({
-          access_token: res.data.access_token,
-          refresh_token: res.data.refresh_token,
-        });
+        console.log('登录成功:', res);
+        setToken(res.data.access_token);
       })
       .catch(err => {
-        console.error('err:', err);
+        console.error('登录出错:', err);
       });
   };
 
   return (
     <div className="App">
       <button className="btn" onClick={login}>
-        {token?.access_token ? '已登录' : '登录'}
+        {token ? '已登录' : '登录'}
       </button>
+
+      <button className="btn" onClick={query}>
+        查询
+      </button>
+
+      <div>数据: {JSON.stringify(response.data)}</div>
     </div>
   );
 }

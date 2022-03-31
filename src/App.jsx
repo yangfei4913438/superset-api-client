@@ -5,6 +5,7 @@ function App() {
   const [token, setToken] = useState('');
   const [response, setResponse] = useState({});
   const [sql, setSql] = useState('');
+  const [dataset, setDataset] = useState({ metrics: [], columns: [] });
 
   const data = {
     datasource: { id: 145, type: 'table' }, // 确定好数据集的ID，类型不改！
@@ -19,6 +20,7 @@ function App() {
         },
         // 全局筛选条件
         filter: [
+          // 普通查询
           {
             col: 'response_year',
             op: 'IN',
@@ -29,6 +31,17 @@ function App() {
             op: 'IN',
             val: [3],
           },
+          // 范围查询demo
+          // {
+          //   col: 'low_value',
+          //   op: '>=',
+          //   val: 1,
+          // },
+          // {
+          //   col: 'low_value',
+          //   op: '<=',
+          //   val: 4,
+          // },
         ],
         // 分组条件
         columns: ['organ_name'],
@@ -107,8 +120,25 @@ function App() {
       });
   };
 
+  const datasetInfo = () => {
+    axios
+      .get('/api/v1/dataset/145', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(res => {
+        console.log('数据集:', res);
+        setDataset(res.data.result);
+      })
+      .catch(err => {
+        console.error('查询数据集出错:', err);
+      });
+  };
+
   return (
-    <div className="p-8">
+    <div className="p-8 space-y-8">
       <article className="flex space-x-8">
         <button className="btn" onClick={login}>
           {token ? '已登录' : '登录'}
@@ -121,16 +151,33 @@ function App() {
         <button className="btn" onClick={getSql}>
           查看SQL
         </button>
+
+        <button className="btn" onClick={datasetInfo}>
+          查询数据集信息
+        </button>
       </article>
 
-      <br />
+      <div>
+        <h3>数据: </h3>
+        <code>{JSON.stringify(response)}</code>
+      </div>
 
-      <h4>数据: </h4>
-      <div>{JSON.stringify(response.data)}</div>
+      <div>
+        <h3>查询：</h3>
+        <code>{sql.query}</code>
+      </div>
 
-      <br />
-      <h4>查询：</h4>
-      <code>{sql.query}</code>
+      <div className="space-y-4">
+        <h3>数据集信息:</h3>
+        <div>
+          <h4>列名:</h4>
+          <code>{JSON.stringify(dataset.columns.map(o => o.column_name))}</code>
+        </div>
+        <div>
+          <h4>指标名称:</h4>
+          <code>{JSON.stringify(dataset.metrics.map(o => o.metric_name))}</code>
+        </div>
+      </div>
     </div>
   );
 }

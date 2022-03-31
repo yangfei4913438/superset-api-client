@@ -209,7 +209,7 @@ function App() {
 
       <div>
         <h3>数据: </h3>
-        <code>{JSON.stringify(response)}</code>
+        <code>{JSON.stringify(response.data?.map(Object.values))}</code>
       </div>
 
       <div>

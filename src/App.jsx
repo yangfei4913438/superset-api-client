@@ -20,9 +20,8 @@ function App() {
       {
         // where 或者 having
         extras: {
-          having: '',
-          having_druid: [],
-          where: "(question_key = 'q1001')",
+          having: '(2 < 3) and (1 < 2)', // 分组过滤多条件，单个只需要写一个，每个条件表达式都需要用小括号包围。
+          where: "(question_key = 'q1001') and (1 < 2)", // 多条件查询
         },
         // 全局筛选条件
         filter: [

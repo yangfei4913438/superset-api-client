@@ -15,7 +15,7 @@ function App() {
 
   const data = {
     datasource: { id: 145, type: 'table' }, // 确定好数据集的ID，类型不改！
-    force: false,
+    force: false, // 使用缓存，如果改成 true, 清理缓存，直接使用新数据。返回的数据中含有缓存时间以及过期时间，可以根据这个设计过期机制。
     queries: [
       {
         // where 或者 having
@@ -64,7 +64,7 @@ function App() {
   const query = () => {
     axios
       .post(
-        '/api/v1/chart/data',
+        'http://localhost:8088/api/v1/chart/data', // 已经配置superset服务端支持跨域，所以这里不再需要代理。下同。
         {
           ...data,
           result_type: 'full',
@@ -88,7 +88,7 @@ function App() {
   const getSql = () => {
     axios
       .post(
-        '/api/v1/chart/data',
+        'http://localhost:8088/api/v1/chart/data',
         {
           ...data,
           result_type: 'query',
@@ -111,7 +111,7 @@ function App() {
 
   const login = () => {
     axios
-      .post('/api/v1/security/login', {
+      .post('http://localhost:8088/api/v1/security/login', {
         username: 'admin',
         password: 'Superset',
         provider: 'db',
@@ -127,7 +127,7 @@ function App() {
 
   const datasetInfo = () => {
     axios
-      .get('/api/v1/dataset/145', {
+      .get('http://localhost:8088/api/v1/dataset/145', {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -145,7 +145,7 @@ function App() {
   const getOptions = () => {
     axios
       .post(
-        '/api/v1/chart/data',
+        'http://localhost:8088/api/v1/chart/data',
         {
           ...data,
           queries: [

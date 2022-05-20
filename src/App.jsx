@@ -75,7 +75,7 @@ function App() {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // 如果需要匿名访问，请不要使用这个属性，而且public中存在相关数据库的访问权限。下同
           },
         }
       )

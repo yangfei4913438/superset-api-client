@@ -4,8 +4,11 @@ superset默认的ui没办法提供浏览器自适应，个性化图表渲染等�
 
 本项目依赖superset作为服务器，只要配置数据库和数据集就行。
 
-开发的时候，需要修改vite的代理配置，生产环境需要自己配置跨域。（我不清楚superset是否支持开启跨域。）
+开发的时候，需要修改vite的代理配置，生产环境需要自己配置跨域。
 
+superset需要配置一下用户权限，只需要有数据库的访问权限（superset中的配置）即可。
+
+然后需要把public角色中的权限给清空，不要给匿名用户权限。
 
 ## English Description.
 
@@ -13,4 +16,8 @@ superset's default ui has no way to provide browser adaption, personalized chart
 
 This project relies on superset as the server, just configure the database and dataset.
 
-When developing, we need to modify the proxy configuration of vite, and the production environment needs to configure cross-domain itself. (I'm not sure if superset supports enabling cross-domain.)
+When developing, you need to modify the proxy configuration of vite, and the production environment needs to configure cross-domain by itself.
+
+The superset needs to be configured with user permissions, only the database access (configured in superset) is required.
+
+Then you need to clear the permissions in the public role and don't give anonymous user permissions.

@@ -13,29 +13,32 @@ function App() {
   // 维度的可选值
   const [options, setOptions] = useState([]);
 
+  // 数据集ID
+  const datasetId = 5;
+
   const data = {
-    datasource: { id: 145, type: 'table' }, // 确定好数据集的ID，类型不改！
+    datasource: { id: datasetId, type: 'table' }, // 确定好数据集的ID，类型不改！
     force: false, // 使用缓存，如果改成 true, 清理缓存，直接使用新数据。返回的数据中含有缓存时间以及过期时间，可以根据这个设计过期机制。
     queries: [
       {
         // where 或者 having
         extras: {
-          having: '2 < 3 and 1 < 2', // 分组过滤多条件
-          where: "question_key = 'q1001' and 1 < 2", // 多条件查询
+          // having: '2 < 3 and 1 < 2', // 分组过滤多条件
+          // where: "question_key = 'q1001' and 1 < 2", // 多条件查询
         },
         // 全局筛选条件
         filter: [
           // 普通查询
-          {
-            col: 'response_year',
-            op: 'IN',
-            val: [2022],
-          },
-          {
-            col: 'response_month',
-            op: 'IN',
-            val: [3],
-          },
+          // {
+          //   col: 'response_year',
+          //   op: 'IN',
+          //   val: [2022],
+          // },
+          // {
+          //   col: 'response_month',
+          //   op: 'IN',
+          //   val: [3],
+          // },
           // 范围查询demo
           // {
           //   col: 'low_value',
@@ -49,11 +52,11 @@ function App() {
           // },
         ],
         // 分组条件
-        columns: ['organ_name'],
+        columns: ['month'],
         // 指标名称
-        metrics: ['上月满意度', '本月满意度'],
+        metrics: ['count'],
         // 排序指标
-        orderby: [['本月满意度', false]], // 降序排列
+        orderby: [['count', false]], // 降序排列
         // 查询行现在
         row_limit: 50000,
       },
@@ -64,7 +67,7 @@ function App() {
   const query = () => {
     axios
       .post(
-        'http://localhost:8088/api/v1/chart/data', // 已经配置superset服务端支持跨域，所以这里不再需要代理。下同。
+        `/api/v1/chart/data`, // 已经配置superset服务端支持跨域，所以这里不再需要代理。下同。
         {
           ...data,
           result_type: 'full',
@@ -88,7 +91,7 @@ function App() {
   const getSql = () => {
     axios
       .post(
-        'http://localhost:8088/api/v1/chart/data',
+        `/api/v1/chart/data`,
         {
           ...data,
           result_type: 'query',
@@ -111,9 +114,9 @@ function App() {
 
   const login = () => {
     axios
-      .post('http://localhost:8088/api/v1/security/login', {
-        username: 'admin',
-        password: 'Superset',
+      .post(`/api/v1/security/login`, {
+        username: 'xuehua',
+        password: '111111',
         provider: 'db',
       })
       .then(res => {
@@ -127,7 +130,7 @@ function App() {
 
   const datasetInfo = () => {
     axios
-      .get('http://localhost:8088/api/v1/dataset/145', {
+      .get(`/api/v1/dataset/${datasetId}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -145,12 +148,12 @@ function App() {
   const getOptions = () => {
     axios
       .post(
-        'http://localhost:8088/api/v1/chart/data',
+        `/api/v1/chart/data`,
         {
           ...data,
           queries: [
             {
-              columns: ['comm_name'],
+              columns: ['month'],
               metrics: [
                 {
                   expressionType: 'SQL',
@@ -176,7 +179,7 @@ function App() {
       )
       .then(res => {
         console.log('查询项目的可选项:', res);
-        setOptions(res.data.result[0].data);
+        setOptions(res.data.result[0].data.map(o => o?.['month']));
       })
       .catch(err => {
         console.error('查询项目的可选项出错:', err);
@@ -231,7 +234,7 @@ function App() {
 
       <div>
         <h3>comm_name选项列表：</h3>
-        <code>{JSON.stringify(options?.map(o => o.comm_name))}</code>
+        <code>{JSON.stringify(options)}</code>
       </div>
     </div>
   );

@@ -1,6 +1,16 @@
 module.exports = {
-  arrowParens: 'avoid', // 箭头函数参数括号，默认avoid 可选 avoid| always,avoid 能省略括号的时候就省略 例如x => x，always 总是有括号
-  singleQuote: true, // 使用单引号, 默认false(在jsx中配置无效, 默认都是双引号)
-  tabWidth: 2,
-  printWidth: 120, // 换行字符串阈值
+  plugins: [require('prettier-plugin-tailwindcss')],
+  overrides: [
+    {
+      files: '*.{js,ts,jsx,tsx,css,scss,json,md,mdx,yaml,yml}',
+      options: {
+        semi: true, // 使用分号
+        singleQuote: true, // 使用单引号而不是双引号
+        tabWidth: 2, // 锁进宽度
+        trailingComma: 'es5', // 在 ES5 中有效的尾随逗号（对象、数组等）。TypeScript 中的类型参数中没有尾随逗号
+        printWidth: 100, // 每行宽度
+        bracketSameLine: false, // 闭合符号在单独一行
+      },
+    },
+  ],
 };

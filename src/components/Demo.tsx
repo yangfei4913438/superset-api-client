@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-function App() {
+function Demo() {
   // 权限
   const [token, setToken] = useState('');
   // 数据
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState<any>({});
   // 查询SQL
-  const [sql, setSql] = useState('');
+  const [sql, setSql] = useState<any>('');
   // 数据集信息
   const [dataset, setDataset] = useState({ metrics: [], columns: [] });
   // 维度的可选值
@@ -79,11 +79,11 @@ function App() {
           },
         }
       )
-      .then(res => {
+      .then((res) => {
         console.log('查询数据:', res);
         setResponse(res.data.result[0]);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('查询出错:', err);
       });
   };
@@ -103,11 +103,11 @@ function App() {
           },
         }
       )
-      .then(res => {
+      .then((res) => {
         console.log('查询SQL:', res);
         setSql(res.data.result[0]);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('查询SQL出错:', err);
       });
   };
@@ -119,11 +119,11 @@ function App() {
         password: '111111',
         provider: 'db',
       })
-      .then(res => {
+      .then((res) => {
         console.log('登录成功:', res);
         setToken(res.data.access_token);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('登录出错:', err);
       });
   };
@@ -136,11 +136,11 @@ function App() {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then(res => {
+      .then((res) => {
         console.log('数据集:', res);
         setDataset(res.data.result);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('查询数据集出错:', err);
       });
   };
@@ -177,17 +177,17 @@ function App() {
           },
         }
       )
-      .then(res => {
+      .then((res) => {
         console.log('查询项目的可选项:', res);
-        setOptions(res.data.result[0].data.map(o => o?.['month']));
+        setOptions(res.data.result[0].data.map((o: { [x: string]: any }) => o?.['month']));
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('查询项目的可选项出错:', err);
       });
   };
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="space-y-8 p-8">
       <article className="flex space-x-8">
         <button className="btn" onClick={login}>
           {token ? '已登录' : '登录'}
@@ -212,7 +212,7 @@ function App() {
 
       <div>
         <h3>数据: </h3>
-        <code>{JSON.stringify(response.data?.map(Object.values))}</code>
+        <code>{JSON.stringify(response?.data?.map(Object.values))}</code>
       </div>
 
       <div>
@@ -224,11 +224,11 @@ function App() {
         <h3>数据集信息:</h3>
         <div>
           <h4>列名:</h4>
-          <code>{JSON.stringify(dataset.columns?.map(o => o.column_name))}</code>
+          <code>{JSON.stringify(dataset.columns?.map((o: any) => o.column_name))}</code>
         </div>
         <div>
           <h4>指标名称:</h4>
-          <code>{JSON.stringify(dataset.metrics?.map(o => o.metric_name))}</code>
+          <code>{JSON.stringify(dataset.metrics?.map((o: any) => o.metric_name))}</code>
         </div>
       </div>
 
@@ -240,4 +240,4 @@ function App() {
   );
 }
 
-export default App;
+export default Demo;

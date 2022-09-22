@@ -7,8 +7,9 @@ import customBar from './themes/customBar.json';
 
 function Echart(
   {
-    width,
-    height,
+    width = 'auto',
+    height = 500,
+    className,
     themeType = choiceForm.themeName,
     echartOptions,
     eventHandlers,
@@ -34,22 +35,16 @@ function Echart(
     registerTheme(customBar.themeName, customBar.theme);
   }, []);
 
-  const options = useMemo(() => {
-    const { toolbox = { feature: {} }, ...baseOptions } = echartOptions;
-    return {
-      ...baseOptions,
-      toolbox: {
-        // @ts-ignore
-        ...toolbox,
-        show: true,
-        feature: {
-          // @ts-ignore
-          ...toolbox?.feature,
-          dataView: { readOnly: true },
-        },
-      },
+  // 监听宽度
+  useEffect(() => {
+    const resize = () => {
+      chartRef.current?.resize({ width: width, height: height });
     };
-  }, [echartOptions]);
+    window.addEventListener('resize', resize);
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, [chartRef.current, width, height]);
 
   useEffect(() => {
     if (!divRef.current) return;
@@ -69,8 +64,8 @@ function Echart(
       chartRef.current?.getZr().on(name, handler);
     });
 
-    chartRef.current?.setOption(options, true, true);
-  }, [options, eventHandlers, zrEventHandlers, themeType]);
+    chartRef.current?.setOption(echartOptions, true, true);
+  }, [chartRef.current, echartOptions, eventHandlers, zrEventHandlers, themeType]);
 
   useEffect(() => {
     // 只有主题变化才会触发更新
@@ -79,10 +74,10 @@ function Echart(
       chartRef.current?.clear();
       chartRef.current?.dispose();
       chartRef.current = init(divRef.current, themeType);
-      chartRef.current.setOption(options, true, true);
-      chartRef.current.resize({ width, height });
+      chartRef.current.setOption(echartOptions, true, true);
+      chartRef.current.resize({ width: width, height: height });
     }
-  }, [height, options, themeType, width]);
+  }, [chartRef.current, width, height, echartOptions, themeType, width]);
 
   // highlighting
   useEffect(() => {
@@ -98,15 +93,15 @@ function Echart(
       });
     }
     previousSelection.current = currentSelection;
-  }, [currentSelection]);
+  }, [chartRef.current, currentSelection]);
 
   useEffect(() => {
     if (chartRef.current) {
-      chartRef.current.resize({ width, height });
+      chartRef.current.resize({ width: width, height: height });
     }
-  }, [width, height]);
+  }, [chartRef.current, width, height]);
 
-  return <div ref={divRef} style={{ width, height }} />;
+  return <div ref={divRef} className={className} style={{ width, height }} />;
 }
 
 export default forwardRef(Echart);

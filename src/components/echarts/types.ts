@@ -1,9 +1,10 @@
 import { EChartsCoreOption, ECharts } from 'echarts';
 
 export interface EchartsProps {
-  width: number;
-  height: number;
   echartOptions: EChartsCoreOption;
+  className?: string;
+  width?: number | 'auto';
+  height?: number;
   themeType?: string;
   eventHandlers?: EventHandlers;
   zrEventHandlers?: EventHandlers;

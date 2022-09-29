@@ -14,7 +14,19 @@ function Demo() {
   const [options, setOptions] = useState([]);
 
   // 数据集ID
-  const datasetId = 5;
+  const datasetId = 6;
+  // 是否匿名访问
+  const isGuest = true;
+  // 请求头
+  let headers: { [key: string]: string } = {
+    'Content-Type': 'application/json',
+  };
+  if (isGuest) {
+    headers = {
+      ...headers,
+      Authorization: `Bearer ${token}`, // 如果需要匿名访问，请不要使用这个属性，而且public中存在相关数据库的访问权限。下同
+    };
+  }
 
   const data = {
     datasource: { id: datasetId, type: 'table' }, // 确定好数据集的ID，类型不改！
@@ -24,21 +36,21 @@ function Demo() {
         // where 或者 having
         extras: {
           // having: '2 < 3 and 1 < 2', // 分组过滤多条件
-          // where: "question_key = 'q1001' and 1 < 2", // 多条件查询
+          // where: "complaint_level = '一般投诉'", // 多条件查询
         },
         // 全局筛选条件
-        filter: [
+        filters: [
           // 普通查询
-          // {
-          //   col: 'response_year',
-          //   op: 'IN',
-          //   val: [2022],
-          // },
-          // {
-          //   col: 'response_month',
-          //   op: 'IN',
-          //   val: [3],
-          // },
+          {
+            col: 'year',
+            op: 'IN',
+            val: ['2021', '2022'],
+          },
+          {
+            col: 'month',
+            op: 'IN',
+            val: ['03', '04'],
+          },
           // 范围查询demo
           // {
           //   col: 'low_value',
@@ -52,11 +64,24 @@ function Demo() {
           // },
         ],
         // 分组条件
-        columns: ['month'],
+        columns: ['year', 'month'],
         // 指标名称
-        metrics: ['count'],
+        // coalesce(neighbor_interaction, 0) 表示值为空的时候返回0
+        metrics: [
+          {
+            expressionType: 'SQL',
+            label: 'value',
+            sqlExpression:
+              'sum(coalesce(neighbor_interaction, 0)) + sum(coalesce(staff, 0)) + sum(coalesce(indoor_maintenance, 0))',
+          },
+        ],
+        // 启用排序
+        order_desc: true,
         // 排序指标
-        orderby: [['count', false]], // 降序排列
+        orderby: [
+          ['year', true], // 升序排列
+          ['month', true], // 升序排列
+        ],
         // 查询行现在
         row_limit: 50000,
       },
@@ -73,10 +98,7 @@ function Demo() {
           result_type: 'full',
         },
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`, // 如果需要匿名访问，请不要使用这个属性，而且public中存在相关数据库的访问权限。下同
-          },
+          headers,
         }
       )
       .then((res) => {
@@ -97,10 +119,7 @@ function Demo() {
           result_type: 'query',
         },
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers,
         }
       )
       .then((res) => {
@@ -131,10 +150,7 @@ function Demo() {
   const datasetInfo = () => {
     axios
       .get(`/api/v1/dataset/${datasetId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
       })
       .then((res) => {
         console.log('数据集:', res);
@@ -171,10 +187,7 @@ function Demo() {
           result_type: 'full',
         },
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers,
         }
       )
       .then((res) => {
